@@ -240,15 +240,15 @@ See https://arxiv.org/help/arxiv_identifier_for_services")
 
 (defconst persid-pmid-query-url
   "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?ids=%s&format=json"
-  "URL to query for a pmid convertsion (json)")
+  "URL to query for a pmid conversion (json)")
 
 (defconst persid-pmcid-query-url
   "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?ids=%s&format=json"
-  "URL to query for a pmcid concversion (json)")
+  "URL to query for a pmcid conversion (json)")
 
 (defconst persid-arxiv-query-url
   "https://ui.adsabs.harvard.edu/abs/arXiv:%s/exportcitation"
-  "URL to query for an arxiv document (bibtex)")
+  "URL to query for an arxiv article (bibtex)")
 
 (defun persid-isbn-10-check (identifier)
   "Check whether IDENTIFIER is a valid isbn-10 and returns a
@@ -263,7 +263,7 @@ normalized identifier."
           normalized))))
 
 (defun persid-isbn-13-check (identifier)
-  "Check whether IDENTIFIER is a valid isbn-10 and returns a
+  "Check whether IDENTIFIER is a valid isbn-13 and returns a
 normalized identifier."
 
   (when (string-match persid-isbn-13-regex identifier)
@@ -370,16 +370,20 @@ normalized identifier."
     (persid-bibtex-from-doi doi)))
 
 (defun persid-info-from-issn (identifier)
-  "Retrieve information from a ISSN  IDENTIFIER"
+  "Retrieve information from a ISSN IDENTIFIER"
   
   (when-let ((issn (persid-issn-check identifier)))
     (persid--openalex/venue persid-issn-query-url issn)))
   
 (defun persid-bibtex-from-isbn (identifier)
+  "Retrieve bibtex information from an ISBN IDENTIFIER"
+  
   (message "Not yet implemented"))
 
 (defun persid--decode-entities (html)
-  "Decode HTML entities. See https://emacs.stackexchange.com/questions/3138"
+  "Decode HTML entities.
+ See https://emacs.stackexchange.com/questions/3138"
+
   (with-temp-buffer
     (save-excursion (insert html))
     (xml-parse-string)))
@@ -388,9 +392,9 @@ normalized identifier."
   "Retrieve bibtex information from an arxiv IDENTIFIER"
   
   (when-let* ((arxiv (persid-arxiv-check identifier))
-              (query-url (format persid-arxiv-query-url arxiv)))
+              (url (format persid-arxiv-query-url arxiv)))
     (with-temp-buffer
-      (url-insert-file-contents query-url)
+      (url-insert-file-contents url)
       (let ((text (delete-and-extract-region (point-min) (point-max))))
         (insert (url-unhex-string text)))
       (goto-char (point-min))
@@ -426,15 +430,15 @@ normalized identifier."
 
 (defun persid--openalex/venue (url identifier &optional email)
   "Return the name of venue identified by IDENTIFIER using openalex as
-backend. If an EMAIL is provided, it is appended to the query
-such as to access the much faster polite-pool."
+a backend. If an EMAIL is provided, it is appended to the query
+such as to access the (faster) polite-pool."
   
   (let* ((email (or email persid-mail-address))
-         (query-url (format url identifier))
-         (query-url (if email
-                        (format "%s?mailto=%s" query-url email)
-                      query-url))
-         (info (with-temp-buffer (url-insert-file-contents query-url)
+         (url (format url identifier))
+         (url (if email
+                  (format "%s?mailto=%s" url email)
+                url))
+         (info (with-temp-buffer (url-insert-file-contents url)
                                  (json-parse-buffer :object-type 'plist)))
          (title (plist-get info :display_name))
          (publisher (plist-get info :publisher)))
