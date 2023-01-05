@@ -95,9 +95,9 @@
 ;;
 ;;; Code:
 (defcustom persid-mail-address user-mail-address
-  "Email that is used to access openalex.org polite-pool (that is
-much faster, see https://docs.openalex.org/). Set it to nil if
-you prefer anonymous access.")
+  "Email is used to access 'polite pools' on various domain and
+provide a faster access. Set it to nil if you prefer anonymous
+access.")
 
 (defconst persid-formats '(isbn issn doi pmid pmcid arxiv)
   "List of known identifier formats")
@@ -372,7 +372,7 @@ normalized identifier."
   (when-let ((issn (persid-issn-check identifier)))
     (persid--openalex/venue persid-issn-query-url issn)))
   
-(defun persid-info-from-isbn (identifier)
+(defun persid-bibtex-from-isbn (identifier)
   (message "Not yet implemented"))
 
 (defun persid--decode-entities (html)
@@ -420,7 +420,6 @@ normalized identifier."
   (let ((parts (split-string name " ")))
     (concat (car (last parts)) ", "
             (mapconcat #'identity (butlast parts) " "))))
-
 
 (defun persid--openalex/venue (url identifier &optional email)
   "Return the name of venue identified by IDENTIFIER using openalex as
