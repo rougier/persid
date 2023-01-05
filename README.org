@@ -33,7 +33,7 @@ is queried online:
 - *pmcid*: [[https://www.ncbi.nlm.nih.gov/pmc/tools/id-converter-api/][PubMed converter API]] is used to convert pmcid to doi,
          then the crossref API is used to get bibtex.
 - *arxiv*: [[https://arxiv.org/help/api/][arXiv API]] is used to get bibtex
-- *issn*: (info only) [[https://docs.openalex.org/][openalex API]] is used to get the name and the
+- *issn*: [[https://docs.openalex.org/][OpenAlex API]] is used to get the name and the
   publisher information. 
 - *isbn*: not yet implemented (lack of consistent open database)
 
