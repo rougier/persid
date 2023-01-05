@@ -67,6 +67,9 @@
 ;;   Information Studies: APIs for scholarly resources
 ;;   https://guides.lib.berkeley.edu/information-studies/apis
 ;;
+;;   Free and Paid APIs to access books information via ISBN
+;;   https://www.vinzius.com/post/free-and-paid-api-isbn/
+;;
 ;; Example usage:
 ;; ==============
 ;; 
