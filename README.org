@@ -27,18 +27,18 @@ bibtex. To do that, the format of the identifier is first
 identified and normalized (if needed), then  the correspoding bibtex
 is queried online:
 
-- doi: the crossref API is used
-- pmid : the pubmed API is used to convert the pmid to doi
+- *doi*: the crossref API is used
+- *pmid*: the pubmed API is used to convert the pmid to doi
+        and then the crossref is used.
+- *pmcid*: the pubmed API is used to convert the pmcid to doi
          and then the crossref is used.
-- pmcid : the pubmed API is used to convert the pmcid to doi
-          and then the crossref is used.
-- arxiv: the arxiv API is used
-- issn (info only): the openalex API is used
-- isbn: not yet implemented (lack of consistent open database)
+- *arxiv*: the arxiv API is used
+- *issn*: (info only): the openalex API is used
+- *isbn*: not yet implemented (lack of consistent open database)
 
-See also:
-  Information Studies: APIs for scholarly resources
-  https://guides.lib.berkeley.edu/information-studies/apis
+*See also*:
+
+  [[Information Studies: APIs for scholarly resources][https://guides.lib.berkeley.edu/information-studies/apis]]
 
 ** Example usage
 
