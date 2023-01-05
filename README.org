@@ -5,12 +5,12 @@ The Persistent Identifier Library allows to manipulate persistent
 identifiers that are used to locate scholar resources online. The
 library knows about the following formats:
 
-- isbn: International Standard Book Number (https://isbn.org)
-- issn: International Standard Serial Number (https://www.issn.org)
-- doi: Digital Object identifier (https://www.doi.org)
-- pmid: PubMed (https://pubmed.ncbi.nlm.nih.gov)
-- pmcid: PubMed Central (https://www.ncbi.nlm.nih.gov/pmc)
-- arxiv: Cornell University (https://arxiv.org)
+- *isbn*: International Standard Book Number (https://isbn.org)
+- *issn*: International Standard Serial Number (https://www.issn.org)
+- *doi*: Digital Object identifier (https://www.doi.org)
+- *pmid*: PubMed (https://pubmed.ncbi.nlm.nih.gov)
+- *pmcid*: PubMed Central (https://www.ncbi.nlm.nih.gov/pmc)
+- *arxiv*: Cornell University (https://arxiv.org)
 
 Given an identifier in one of the known formats, the libray can
 query information about the resources and format it as a bibtex
@@ -36,9 +36,7 @@ is queried online:
 - *issn*: (info only): the openalex API is used
 - *isbn*: not yet implemented (lack of consistent open database)
 
-*See also*:
-
-  [[Information Studies: APIs for scholarly resources][https://guides.lib.berkeley.edu/information-studies/apis]]
+*See also*: [[https://guides.lib.berkeley.edu/information-studies/apis][Information Studies: APIs for scholarly resources]]
 
 ** Example usage
 
