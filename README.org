@@ -79,3 +79,10 @@ archivePrefix = {arXiv},
   supported by citeproc for high quality export to HTML, markdown,
   plain text, or stand-alone (i.e. independent of a bibtex file)
   LaTeX.
+
+ - [[https://github.com/yantar92/org-capture-ref][org-capture-ref]] extends org-ref's idea to auto-retrieve BiBTeX from
+   scientific paper links. Instead of limiting BiBTeX generation to
+   research purposes (scientific articles and books), this package
+   auto-generates BiBTeX for any possible web link (Youtube videos,
+   blog posts, reddit threads, etc).
+   
