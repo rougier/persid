@@ -63,3 +63,19 @@ archivePrefix = {arXiv},
 }
 #+end_src bibtex
 
+** Related work
+
+- [[https://github.com/cpitclaudel/biblio.el][biblio.el]] makes it easy to browse and gather bibliographic
+  references and publications from various sources, by keywords or by
+  DOI. References are automatically fetched from well-curated sources,
+  and formatted as BibTeX.
+
+- [[https://github.com/jkitchin/org-ref][org-ref]] makes it easy to insert citations, cross-references, indexes
+  and glossaries as hyper-functional links into org files. The links
+  are fontified so you can tell them apart from other links, and each
+  link is clickable to access functions like opening a pdf, notes or
+  url associated with the link. Each link also can be exported to
+  LaTeX to build a PDF. For citations, export to other formats is
+  supported by citeproc for high quality export to HTML, markdown,
+  plain text, or stand-alone (i.e. independent of a bibtex file)
+  LaTeX.
