@@ -43,10 +43,9 @@
 ;; query information about the resources and format it as a bibtex
 ;; entry. To do so, the library primarily use the crossref.org API
 ;; (doi,pmid, pcmi), openalex.org API (issn), arxiv API (arxiv)
-;; and openlibrary.org (isbn) Unfortunately, openlibrary.org is far
+;; and ebook.de (isbn) Unfortunately, ebook.de is far
 ;; from being complete and a lot of ISBN records are
-;; missing. Alternative would be to use the isbndb.com service but it
-;; is a subscription based service.
+;; missing.
 ;;
 ;; The main function is the interactive `persid-bibtex-from` function
 ;; that accept a single identifier and return the corresponding
@@ -61,7 +60,7 @@
 ;;           and then the crossref is used.
 ;; - arxiv: the arxiv API is used
 ;; - issn (info only): the openalex API is used
-;; - isbn: not yet implemented (lack of consistent open database)
+;; - isbn: ebook.de
 ;;
 ;; See also:
 ;;   Information Studies: APIs for scholarly resources
@@ -227,8 +226,8 @@ Note: This will only match arxiv ids registered after 01/04/2007
 See https://arxiv.org/help/arxiv_identifier_for_services")
   
 (defconst persid-isbn-query-url
-  "https://openlibrary.org/isbn/%s.json"
-  "URL to query for an isbn book (json).")
+  "https://www.ebook.de/de/tools/isbn2bibtex?isbn=%s"
+  "URL to query for an isbn book (bibtex).")
 
 (defconst persid-issn-query-url
   "https://api.openalex.org/venues/issn:%s"
@@ -236,7 +235,7 @@ See https://arxiv.org/help/arxiv_identifier_for_services")
 
 (defconst persid-doi-query-url
   "https://api.crossref.org/works/%s/transform/application/x-bibtex"
-  "URL to query for a doi work (json)")
+  "URL to query for a doi work (bibtex)")
 
 (defconst persid-pmid-query-url
   "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?ids=%s&format=json"
@@ -377,8 +376,12 @@ normalized identifier."
   
 (defun persid-bibtex-from-isbn (identifier)
   "Retrieve bibtex information from an ISBN IDENTIFIER"
-  
-  (message "Not yet implemented"))
+
+  (when-let ((isbn (persid-isbn-check identifier)))
+    (let* ((url (format persid-isbn-query-url isbn)))
+      (with-temp-buffer
+        (url-insert-file-contents url)
+        (buffer-string)))))
 
 (defun persid--decode-entities (html)
   "Decode HTML entities.

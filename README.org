@@ -12,14 +12,12 @@ library knows about the following formats:
 - *pmcid*: PubMed Central (https://www.ncbi.nlm.nih.gov/pmc)
 - *arxiv*: Cornell University (https://arxiv.org)
 
-Given an identifier in one of the known formats, the libray can
-query information about the resources and format it as a bibtex
-entry. To do so, the library primarily use the crossref.org API
-(doi,pmid, pcmi), openalex.org API (issn), arxiv API (arxiv)
-and openlibrary.org (isbn) Unfortunately, openlibrary.org is far
-from being complete and a lot of ISBN records are
-missing. Alternative would be to use the isbndb.com service but it
-is a subscription based service.
+Given an identifier in one of the known formats, the libray can query
+information about the resources and format it as a bibtex entry. To do
+so, the library primarily use the crossref.org API (doi,pmid, pcmi),
+openalex.org API (issn), arxiv API (arxiv) and ebook.de (isbn)
+Unfortunately, ebook.de is far from being complete and a lot of ISBN
+records are missing.
 
 The main function is the interactive `persid-bibtex-from` function
 that accept a single identifier and return the corresponding
@@ -86,3 +84,5 @@ archivePrefix = {arXiv},
   auto-generates BiBTeX for any possible web link (Youtube videos,
   blog posts, reddit threads, etc).
    
+- [[https://github.com/larsmagne/bookiez.el][bookiez]] is a library for looking up ISBNs via the Google Book API,
+  displaying the result, and maintaining a database of books.
