@@ -224,10 +224,16 @@ https://www.crossref.org/blog/dois-and-matching-regular-expressions")
 
 Note: This will only match arxiv ids registered after 01/04/2007
 See https://arxiv.org/help/arxiv_identifier_for_services")
-  
+
+;; Alternatves:
+;; http://openlibrary.org/api/books?bibkeys=ISBN:%s&format=json&jscmd=data
+;; http://www.librarything.com/services/rest/1.1/?method=librarything.ck.getwork&isbn=%s
+;; http://classify.oclc.org/classify2/Classify?isbn=%s&summary=true
+;; https://www.googleapis.com/books/v1/volumes?q=%s+isbn&maxResults=1
 (defconst persid-isbn-query-url
   "https://www.ebook.de/de/tools/isbn2bibtex?isbn=%s"
   "URL to query for an isbn book (bibtex).")
+
 
 (defconst persid-issn-query-url
   "https://api.openalex.org/venues/issn:%s"
@@ -407,6 +413,7 @@ normalized identifier."
          (concat "@Article"
                  (buffer-substring beg (- end (length "</textarea>")))))))))
 
+;;;###autoload
 (defun persid-bibtex-from (identifier)
   "Retrieve bibtex information from given IDENTIFIER"
 
@@ -422,6 +429,13 @@ normalized identifier."
             (setq bibtex (funcall bibfun identifier))
             (throw 'found nil)))))
     bibtex))
+
+;;;###autoload
+(defun bibtex-from (identifier)
+  "Alias to `persid-bibtex-from `function"
+  
+  (persid-bibtex-from identifier))
+
 
 (defun persid--openalex/normalize-name (name)
   "Normalize NAME given as 'firstname(s) surname' to
