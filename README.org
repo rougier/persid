@@ -86,3 +86,13 @@ archivePrefix = {arXiv},
    
 - [[https://github.com/larsmagne/bookiez.el][bookiez]] is a library for looking up ISBNs via the Google Book API,
   displaying the result, and maintaining a database of books.
+
+- [[https://github.com/mpedramfar/zotra][zotra]] provides functions to get bibliographic information from a url
+  and save it into a bibtex file. It also provides a way to obtain a
+  list of attachments (e.g. PDF files) associated with a url. This is
+  done using Zotero translators, but without using the Zotero client.
+
+- [[https://github.com/gkowzan/biblio-zotero][biblio-zotero]] retrieves and insert BibTeX records from various
+  sources by using Zotero translation server. Calling
+  biblio-zotero-insert-bibtex will forward the provided URL to the
+  server and insert a formatted BibTeX entry in the current buffer.
