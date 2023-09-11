@@ -96,3 +96,5 @@ archivePrefix = {arXiv},
   sources by using Zotero translation server. Calling
   biblio-zotero-insert-bibtex will forward the provided URL to the
   server and insert a formatted BibTeX entry in the current buffer.
+
+-[[https://github.com/emacs-citar/citar][Citar]] provides a highly-configurable completing-read front-end to browse and act on BibTeX, BibLaTeX, and CSL JSON bibliographic data, and LaTeX, markdown, and org-cite editing support.
