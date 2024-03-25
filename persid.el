@@ -231,8 +231,8 @@ See https://arxiv.org/help/arxiv_identifier_for_services")
 ;; http://classify.oclc.org/classify2/Classify?isbn=%s&summary=true
 ;; https://www.googleapis.com/books/v1/volumes?q=%s+isbn&maxResults=1
 (defconst persid-isbn-query-url
-  "https://www.ebook.de/de/tools/isbn2bibtex?isbn=%s"
-  "URL to query for an isbn book (bibtex).")
+  "http://openlibrary.org/api/books?bibkeys=ISBN:%s&format=json&jscmd=data"
+  "URL to query for an isbn book (json).")
 
 
 (defconst persid-issn-query-url
