@@ -98,3 +98,6 @@ archivePrefix = {arXiv},
   server and insert a formatted BibTeX entry in the current buffer.
 
 - [[https://github.com/emacs-citar/citar][Citar]] provides a highly-configurable completing-read front-end to browse and act on BibTeX, BibLaTeX, and CSL JSON bibliographic data, and LaTeX, markdown, and org-cite editing support.
+
+- [[https://www.github.com/fabcontigiani/biblio-openlibrary][biblio-openlibrary]] provides an OpenLibrary backend for ~biblio.el~, allowing to
+  /interactively/ browse and gather bibliographic entries from OpenLibrary by ISBN.
