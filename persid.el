@@ -409,10 +409,18 @@ See more: https://openlibrary.org/dev/docs/api/books"
   "Retrieve bibtex information from an ISBN IDENTIFIER"
 
   (when-let ((isbn (persid-isbn-check identifier)))
-    (let* ((url (format persid-isbn-query-url isbn)))
-      (with-temp-buffer
-        (url-insert-file-contents url)
-        (buffer-string)))))
+    (let* ((url (format persid-isbn-query-url isbn))
+           (info (persid--info-from-openlibrary url))
+           (bibtex (let-alist info
+                     (format "@book{,
+title     = {%s},
+author    = {%s},
+publisher = {%s},
+year      = {%s},
+isbn      = {%s},
+url       = {%s},
+}" .title .author .publisher .year .isbn .url))))
+      bibtex)))
 
 (defun persid--decode-entities (html)
   "Decode HTML entities.
