@@ -15,8 +15,8 @@ library knows about the following formats:
 Given an identifier in one of the known formats, the libray can query
 information about the resources and format it as a bibtex entry. To do
 so, the library primarily use the crossref.org API (doi,pmid, pcmi),
-openalex.org API (issn), arxiv API (arxiv) and ebook.de (isbn)
-Unfortunately, ebook.de is far from being complete and a lot of ISBN
+openalex.org API (issn), arxiv API (arxiv) and OpenLibrary (isbn)
+Unfortunately, OpenLibrary is far from being complete and a lot of ISBN
 records are missing.
 
 The main function is the interactive =persid-bibtex-from= function
@@ -33,7 +33,7 @@ is queried online:
 - *arxiv*: [[https://arxiv.org/help/api/][arXiv API]] is used to get bibtex
 - *issn*: [[https://docs.openalex.org/][OpenAlex API]] is used to get the name and the
   publisher information. 
-- *isbn*: not yet implemented (lack of consistent open database)
+- *isbn*: [[https://openlibrary.org/dev/docs/api/books][OpenLibrary Book API]] is used to get bibtex
 
 *See also*: [[https://guides.lib.berkeley.edu/information-studies/apis][Information Studies: APIs for scholarly resources]]
 
