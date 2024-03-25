@@ -379,7 +379,32 @@ normalized identifier."
   
   (when-let ((issn (persid-issn-check identifier)))
     (persid--openalex/venue persid-issn-query-url issn)))
-  
+
+(defun persid--info-from-openlibrary (openlibrary-url)
+  "Retrieve necessary information to create a BibTeX entry from OPENLIBRARY-URL.
+
+Specifically, retrieve the title, authors, year of publication, publishers,
+ISBN (either 13 or 10), and URL of the corresponding bibliographic work on the
+OpenLibrary website, from the response given by a query to the Book API from
+OpenLibrary via OPENLIBRARY-URL, and return the results as an alist.
+
+See more: https://openlibrary.org/dev/docs/api/books"
+
+  (with-temp-buffer
+    (url-insert-file-contents openlibrary-url)
+    (let-alist (cdar (json-read))
+      (list (cons 'title .title)
+            (cons 'author (s-join " and " (mapcar #'cdadr .authors)))
+            (cons 'year (format-time-string
+                         "%Y"
+                         (encode-time
+                          (decoded-time-set-defaults
+                           (parse-time-string .publish_date)))))
+            (cons 'publisher (s-join " and " (mapcar #'cdar .publishers)))
+            (cons 'isbn (car (append (or .identifiers.isbn_13
+                                         .identifiers.isbn_10) nil)))
+            (cons 'url .url)))))
+
 (defun persid-bibtex-from-isbn (identifier)
   "Retrieve bibtex information from an ISBN IDENTIFIER"
 
