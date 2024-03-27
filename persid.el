@@ -411,7 +411,7 @@ See more: https://openlibrary.org/dev/docs/api/books"
     (let* ((url (format persid-isbn-query-url isbn))
            (info (persid--info-from-openlibrary url))
            (bibtex (let-alist info
-                     (format "@book{,
+                     (format "@book{NO_KEY,
 title     = {%s},
 author    = {%s},
 publisher = {%s},
