@@ -410,13 +410,13 @@ See more: https://openlibrary.org/dev/docs/api/books"
     (url-insert-file-contents openlibrary-url)
     (let-alist (cdar (json-read))
       (list (cons 'title .title)
-            (cons 'author (s-join " and " (mapcar #'cdadr .authors)))
+            (cons 'author (string-join (mapcar #'cdadr .authors) " and "))
             (cons 'year (format-time-string
                          "%Y"
                          (encode-time
                           (decoded-time-set-defaults
                            (parse-time-string .publish_date)))))
-            (cons 'publisher (s-join " and " (mapcar #'cdar .publishers)))
+            (cons 'publisher (string-join (mapcar #'cdar .publishers) " and "))
             (cons 'isbn (car (append (or .identifiers.isbn_13
                                          .identifiers.isbn_10) nil)))
             (cons 'url .url)))))
