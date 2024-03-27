@@ -100,6 +100,23 @@
 provide a faster access. Set it to nil if you prefer anonymous
 access.")
 
+(defcustom persid-isbn-generate-citekey nil
+  "If non-nil, automatically generate a citekey when getting BibTeX from ISBN.
+
+The value `prompt' means that the citekey will be presented to the user in the
+minibuffer area when generated, allowing for edits.
+
+The value `user' means to respect the value of `bibtex-autokey-edit-before-use'
+set by the user.
+
+The creation of the citekey is handled by the built-in `bibtex-mode' via the
+`bibtex-clean-entry' callable, and should respect user's configuration of the
+package, see `bibtex-generate-autokey'."
+  :type '(choice (const :tag "Generate citekey automatically" t)
+                 (const :tag "Prompt user after generating citekey" 'prompt)
+                 (const :tag "Respect user's configuration" 'user)
+                 (const :tag "Don't generate citekey" nil)))
+
 (defconst persid-formats '(isbn issn doi pmid pmcid arxiv)
   "List of known identifier formats")
 
@@ -419,7 +436,16 @@ year      = {%s},
 isbn      = {%s},
 url       = {%s},
 }" .title .author .publisher .year .isbn .url))))
-      bibtex)))
+      (with-temp-buffer
+        (insert bibtex)
+        (when persid-isbn-generate-citekey
+          (bibtex-mode)
+          (unless (eq persid-isbn-generate-citekey 'user)
+            (if (eq persid-isbn-generate-citekey 'prompt)
+                (setq-local bibtex-autokey-edit-before-use t)
+              (setq-local bibtex-autokey-edit-before-use nil)))
+          (bibtex-clean-entry t))
+        (buffer-string)))))
 
 (defun persid--decode-entities (html)
   "Decode HTML entities.
