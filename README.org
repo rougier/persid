@@ -19,10 +19,10 @@ openalex.org API (issn), arxiv API (arxiv) and ebook.de (isbn)
 Unfortunately, ebook.de is far from being complete and a lot of ISBN
 records are missing.
 
-The main function is the interactive =persid-bibtex-from= function
+The main function is the interactive =persid-insert-bibtex= function
 that accept a single identifier and return the corresponding
-bibtex. To do that, the format of the identifier is first
-identified and normalized (if needed), then  the correspoding bibtex
+bibtex inserting it into the buffer. To do that, the format of the identifier is
+first identified and normalized (if needed), then the correspoding bibtex
 is queried online:
 
 - *doi*: [[https://www.crossref.org/documentation/retrieve-metadata/rest-api/a-non-technical-introduction-to-our-api/][Crossref API]] is used to get bibtex
@@ -40,7 +40,7 @@ is queried online:
 ** Example usage
 
 #+begin_src emacs-lisp
-(insert (persid-bibtex-from "arxiv:2008.06030"))
+(persid-insert-bibtex "arxiv:2008.06030")
 #+end_src
 
 #+begin_src bibtex
