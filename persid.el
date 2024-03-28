@@ -431,10 +431,6 @@ normalized identifier."
     bibtex))
 
 ;;;###autoload
-(defun bibtex-from (identifier)
-  "Alias to `persid-bibtex-from `function"
-  
-  (persid-bibtex-from identifier))
 
 
 (defun persid--openalex/normalize-name (name)
