@@ -4,7 +4,7 @@
 
 ;; Maintainer: Nicolas P. Rougier <Nicolas.Rougier@inria.fr>
 ;; URL: https://github.com/rougier/emacs-persid
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: text, bib, references 
 
@@ -43,9 +43,8 @@
 ;; query information about the resources and format it as a bibtex
 ;; entry. To do so, the library primarily use the crossref.org API
 ;; (doi,pmid, pcmi), openalex.org API (issn), arxiv API (arxiv)
-;; and ebook.de (isbn) Unfortunately, ebook.de is far
-;; from being complete and a lot of ISBN records are
-;; missing.
+;; and OpenLibrary Book API (isbn). Unfortunately, OpenLibrary is
+;; far from being complete and a lot of ISBN records are missing.
 ;;
 ;; The main function is the interactive `persid-bibtex-from` function
 ;; that accept a single identifier and return the corresponding
@@ -60,7 +59,7 @@
 ;;           and then the crossref is used.
 ;; - arxiv: the arxiv API is used
 ;; - issn (info only): the openalex API is used
-;; - isbn: ebook.de
+;; - isbn: the OpenLibrary Book API is used
 ;;
 ;; See also:
 ;;   Information Studies: APIs for scholarly resources
@@ -100,6 +99,23 @@
   "Email is used to access 'polite pools' on various domain and
 provide a faster access. Set it to nil if you prefer anonymous
 access.")
+
+(defcustom persid-isbn-generate-citekey nil
+  "If non-nil, automatically generate a citekey when getting BibTeX from ISBN.
+
+The value `prompt' means that the citekey will be presented to the user in the
+minibuffer area when generated, allowing for edits.
+
+The value `user' means to respect the value of `bibtex-autokey-edit-before-use'
+set by the user.
+
+The creation of the citekey is handled by the built-in `bibtex-mode' via the
+`bibtex-clean-entry' callable, and should respect user's configuration of the
+package, see `bibtex-generate-autokey'."
+  :type '(choice (symbol :tag "Generate citekey automatically" t)
+                 (symbol :tag "Prompt user after generating citekey" 'prompt)
+                 (symbol :tag "Respect user's configuration" 'user)
+                 (const :tag "Don't generate citekey" nil)))
 
 (defconst persid-formats '(isbn issn doi pmid pmcid arxiv)
   "List of known identifier formats")
@@ -231,8 +247,8 @@ See https://arxiv.org/help/arxiv_identifier_for_services")
 ;; http://classify.oclc.org/classify2/Classify?isbn=%s&summary=true
 ;; https://www.googleapis.com/books/v1/volumes?q=%s+isbn&maxResults=1
 (defconst persid-isbn-query-url
-  "https://www.ebook.de/de/tools/isbn2bibtex?isbn=%s"
-  "URL to query for an isbn book (bibtex).")
+  "http://openlibrary.org/api/books?bibkeys=ISBN:%s&format=json&jscmd=data"
+  "URL to query for an isbn book (json).")
 
 
 (defconst persid-issn-query-url
@@ -379,14 +395,55 @@ normalized identifier."
   
   (when-let ((issn (persid-issn-check identifier)))
     (persid--openalex/venue persid-issn-query-url issn)))
-  
+
+(defun persid--info-from-openlibrary (openlibrary-url)
+  "Retrieve necessary information to create a BibTeX entry from OPENLIBRARY-URL.
+
+Specifically, retrieve the title, authors, year of publication, publishers,
+ISBN (either 13 or 10), and URL of the corresponding bibliographic work on the
+OpenLibrary website, from the response given by a query to the Book API from
+OpenLibrary via OPENLIBRARY-URL, and return the results as an alist.
+
+See more: https://openlibrary.org/dev/docs/api/books"
+
+  (with-temp-buffer
+    (url-insert-file-contents openlibrary-url)
+    (let-alist (cdar (json-read))
+      (list (cons 'title .title)
+            (cons 'author (string-join (mapcar #'cdadr .authors) " and "))
+            (cons 'year (format-time-string
+                         "%Y"
+                         (encode-time
+                          (decoded-time-set-defaults
+                           (parse-time-string .publish_date)))))
+            (cons 'publisher (string-join (mapcar #'cdar .publishers) " and "))
+            (cons 'isbn (car (append (or .identifiers.isbn_13
+                                         .identifiers.isbn_10) nil)))
+            (cons 'url .url)))))
+
 (defun persid-bibtex-from-isbn (identifier)
   "Retrieve bibtex information from an ISBN IDENTIFIER"
 
   (when-let ((isbn (persid-isbn-check identifier)))
-    (let* ((url (format persid-isbn-query-url isbn)))
+    (let* ((url (format persid-isbn-query-url isbn))
+           (info (persid--info-from-openlibrary url))
+           (bibtex (let-alist info
+                     (format "@book{NO_KEY,
+title     = {%s},
+author    = {%s},
+publisher = {%s},
+year      = {%s},
+isbn      = {%s},
+url       = {%s},
+}" .title .author .publisher .year .isbn .url))))
       (with-temp-buffer
-        (url-insert-file-contents url)
+        (insert bibtex)
+        (when persid-isbn-generate-citekey
+          (bibtex-mode)
+          (unless (eq persid-isbn-generate-citekey 'user)
+            (setq-local bibtex-autokey-edit-before-use
+                        (eq persid-isbn-generate-citekey 'prompt)))
+          (bibtex-clean-entry t))
         (buffer-string)))))
 
 (defun persid--decode-entities (html)
