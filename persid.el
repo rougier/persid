@@ -245,11 +245,14 @@ See https://arxiv.org/help/arxiv_identifier_for_services")
 ;; http://openlibrary.org/api/books?bibkeys=ISBN:%s&format=json&jscmd=data
 ;; http://www.librarything.com/services/rest/1.1/?method=librarything.ck.getwork&isbn=%s
 ;; http://classify.oclc.org/classify2/Classify?isbn=%s&summary=true
-;; https://www.googleapis.com/books/v1/volumes?q=%s+isbn&maxResults=1
+;; https://www.googleapis.com/books/v1/volumes?q=isbn:%s&maxResults=1
 (defconst persid-isbn-query-url
-  "http://openlibrary.org/api/books?bibkeys=ISBN:%s&format=json&jscmd=data"
+  "https://www.googleapis.com/books/v1/volumes?q=isbn:%s&maxResults=1"
   "URL to query for an isbn book (json).")
 
+(defconst persid-gbooks-id-query-url
+  "https://books.google.com/books?id=%s&output=bibtex"
+  "URL to query for a book using Google Books ID (bibtex).")
 
 (defconst persid-issn-query-url
   "https://api.openalex.org/venues/issn:%s"
