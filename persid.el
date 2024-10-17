@@ -43,8 +43,7 @@
 ;; query information about the resources and format it as a bibtex
 ;; entry. To do so, the library primarily use the crossref.org API
 ;; (doi,pmid, pcmi), openalex.org API (issn), arxiv API (arxiv)
-;; and OpenLibrary Book API (isbn). Unfortunately, OpenLibrary is
-;; far from being complete and a lot of ISBN records are missing.
+;; and Google Books API (isbn).
 ;;
 ;; The main function is the interactive `persid-bibtex-from` function
 ;; that accept a single identifier and return the corresponding
@@ -59,7 +58,7 @@
 ;;           and then the crossref is used.
 ;; - arxiv: the arxiv API is used
 ;; - issn (info only): the openalex API is used
-;; - isbn: the OpenLibrary Book API is used
+;; - isbn: the Google Books API is used
 ;;
 ;; See also:
 ;;   Information Studies: APIs for scholarly resources
@@ -71,7 +70,7 @@
 ;; Example usage:
 ;; ==============
 ;; 
-;; (insert (persid-bibtex-from "arxiv:2008.06030"))
+;; (persid-insert-bibtex "arxiv:2008.06030")
 ;;
 ;; @Article{2020arXiv200806030R,
 ;;        author = {{Rougier}, Nicolas P.},

@@ -12,18 +12,16 @@ library knows about the following formats:
 - *pmcid*: PubMed Central (https://www.ncbi.nlm.nih.gov/pmc)
 - *arxiv*: Cornell University (https://arxiv.org)
 
-Given an identifier in one of the known formats, the libray can query
+Given an identifier in one of the known formats, the library can query
 information about the resources and format it as a bibtex entry. To do
 so, the library primarily use the crossref.org API (doi,pmid, pcmi),
-openalex.org API (issn), arxiv API (arxiv) and OpenLibrary (isbn)
-Unfortunately, OpenLibrary is far from being complete and a lot of ISBN
-records are missing.
+openalex.org API (issn), arxiv API (arxiv) and Google Books API (isbn).
 
 The main function is the interactive =persid-insert-bibtex= function
-that accept a single identifier and return the corresponding
-bibtex inserting it into the buffer. To do that, the format of the identifier is
-first identified and normalized (if needed), then the correspoding bibtex
-is queried online:
+that accepts a single identifier and returns the corresponding
+bibtex, inserting it into the buffer. To do that, the format of the
+identifier is first identified and normalized (if needed), then the
+corresponding bibtex is queried online:
 
 - *doi*: [[https://www.crossref.org/documentation/retrieve-metadata/rest-api/a-non-technical-introduction-to-our-api/][Crossref API]] is used to get bibtex
 - *pmid*: [[https://www.ncbi.nlm.nih.gov/pmc/tools/id-converter-api/][PubMed converter API]] is used to convert pmid to doi,
@@ -33,7 +31,7 @@ is queried online:
 - *arxiv*: [[https://arxiv.org/help/api/][arXiv API]] is used to get bibtex
 - *issn*: [[https://docs.openalex.org/][OpenAlex API]] is used to get the name and the
   publisher information. 
-- *isbn*: [[https://openlibrary.org/dev/docs/api/books][OpenLibrary Book API]] is used to get bibtex
+- *isbn*: [[https://developers.google.com/books/docs/overview][Google Books API]] is used to get bibtex
 
 *See also*: [[https://guides.lib.berkeley.edu/information-studies/apis][Information Studies: APIs for scholarly resources]]
 
@@ -101,3 +99,6 @@ archivePrefix = {arXiv},
 
 - [[https://www.github.com/fabcontigiani/biblio-openlibrary][biblio-openlibrary]] provides an OpenLibrary backend for ~biblio.el~, allowing to
   /interactively/ browse and gather bibliographic entries from OpenLibrary by ISBN.
+
+- [[https://github.com/jrasband/biblio-gbooks][biblio-gbooks]] provides a Google Books backend for biblio.el which can pull
+  BibTeX references directly from Google Books.
