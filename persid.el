@@ -6,7 +6,7 @@
 ;; URL: https://github.com/rougier/emacs-persid
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "27.1"))
-;; Keywords: text, bib, references 
+;; Keywords: text, bib, references
 
 ;; This file is not part of GNU Emacs.
 
@@ -71,7 +71,7 @@
 ;;
 ;; Example usage:
 ;; ==============
-;; 
+;;
 ;; (insert (persid-bibtex-from "arxiv:2008.06030"))
 ;;
 ;; @Article{2020arXiv200806030R,
@@ -258,7 +258,7 @@ See https://arxiv.org/help/arxiv_identifier_for_services")
 (defun persid-isbn-10-check (identifier)
   "Check whether IDENTIFIER is a valid isbn-10 and returns a
 normalized identifier."
-  
+
   (when (string-match persid-isbn-10-regex identifier)
     (let* ((group1 (match-string 1 identifier))
            (group2 (match-string 2 identifier))
@@ -295,11 +295,11 @@ normalized identifier."
            (group2 (match-string 2 identifier)))
       (when (eq (+ (length group1) (length group2)) (length identifier))
         group2))))
-  
+
 (defun persid-doi-check (identifier)
   "Check whether IDENTIFIER is a valid doi and returns a
 normalized identifier."
-  
+
   (when (string-match persid-doi-regex identifier)
     (let* ((group1 (match-string 1 identifier))
            (group2 (match-string 2 identifier)))
@@ -309,7 +309,7 @@ normalized identifier."
 (defun persid-pmid-check (identifier)
   "Check whether IDENTIFIER is a valid pmid and returns a
 normalized identifier."
-  
+
   (when (string-match persid-pmid-regex identifier)
     (let* ((group1 (match-string 1 identifier))
            (group2 (match-string 2 identifier)))
@@ -319,7 +319,7 @@ normalized identifier."
 (defun persid-pmcid-check (identifier)
   "Check whether IDENTIFIER is a valid pmcid and returns a
 normalized identifier."
-  
+
   (when (string-match persid-pmcid-regex identifier)
     (let* ((group1 (match-string 1 identifier))
            (group2 (match-string 2 identifier)))
@@ -329,7 +329,7 @@ normalized identifier."
 (defun persid-arxiv-check (identifier)
   "Check whether IDENTIFIER is a valid arxiv and returns a
 normalized identifier."
-  
+
   (when (string-match persid-arxiv-regex identifier)
     (let* ((group1 (match-string 1 identifier))
            (group2 (match-string 2 identifier)))
@@ -338,7 +338,7 @@ normalized identifier."
 
 (defun persid-identify (identifier)
   "Try to identify the format(s) of IDENTIFIER among known formats."
-  
+
   (let ((formats '()))
     (dolist (id-format persid-formats)
       (let ((funcheck (intern (format "persid-%s-check" id-format))))
@@ -376,10 +376,10 @@ normalized identifier."
 
 (defun persid-info-from-issn (identifier)
   "Retrieve information from a ISSN IDENTIFIER"
-  
+
   (when-let ((issn (persid-issn-check identifier)))
     (persid--openalex/venue persid-issn-query-url issn)))
-  
+
 (defun persid-bibtex-from-isbn (identifier)
   "Retrieve bibtex information from an ISBN IDENTIFIER"
 
@@ -399,7 +399,7 @@ normalized identifier."
 
 (defun persid-bibtex-from-arxiv (identifier)
   "Retrieve bibtex information from an arxiv IDENTIFIER"
-  
+
   (when-let* ((arxiv (persid-arxiv-check identifier))
               (url (format persid-arxiv-query-url arxiv)))
     (with-temp-buffer
@@ -419,7 +419,7 @@ normalized identifier."
 
   (interactive
    (list (read-from-minibuffer "Identifier: " nil nil nil 'persid-history)))
-  
+
   (let ((formats (persid-identify identifier))
         (bitex))
     (catch 'found
@@ -433,14 +433,14 @@ normalized identifier."
 ;;;###autoload
 (defun bibtex-from (identifier)
   "Alias to `persid-bibtex-from `function"
-  
+
   (persid-bibtex-from identifier))
 
 
 (defun persid--openalex/normalize-name (name)
   "Normalize NAME given as 'firstname(s) surname' to
  surname, firstname(s)."
-  
+
   (let ((parts (split-string name " ")))
     (concat (car (last parts)) ", "
             (mapconcat #'identity (butlast parts) " "))))
@@ -449,7 +449,7 @@ normalized identifier."
   "Return the name of venue identified by IDENTIFIER using openalex as
 a backend. If an EMAIL is provided, it is appended to the query
 such as to access the (faster) polite-pool."
-  
+
   (let* ((email (or email persid-mail-address))
          (url (format url identifier))
          (url (if email
@@ -485,4 +485,3 @@ polite-pool."
 
 (provide 'persid)
 ;;; persid.el ends here
-
