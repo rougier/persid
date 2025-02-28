@@ -29,7 +29,7 @@
 ;; =============================
 ;;
 ;; The Persistent Identifier Library allows to manipulate persistent
-;; identifiers that are used to locate scholar resources online. The
+;; identifiers that are used to locate scholar resources online.  The
 ;; library knows about the following formats:
 ;;
 ;; - isbn: International Standard Book Number (https://isbn.org)
@@ -41,14 +41,14 @@
 ;;
 ;; Given an identifier in one of the known formats, the libray can
 ;; query information about the resources and format it as a bibtex
-;; entry. To do so, the library primarily use the crossref.org API
+;; entry.  To do so, the library primarily use the crossref.org API
 ;; (doi,pmid, pcmi), openalex.org API (issn), arxiv API (arxiv)
-;; and OpenLibrary Book API (isbn). Unfortunately, OpenLibrary is
+;; and OpenLibrary Book API (isbn).  Unfortunately, OpenLibrary is
 ;; far from being complete and a lot of ISBN records are missing.
 ;;
 ;; The main function is the interactive `persid-bibtex-from` function
 ;; that accept a single identifier and return the corresponding
-;; bibtex. To do that, the format of the identifier is first
+;; bibtex.  To do that, the format of the identifier is first
 ;; identified and normalized (if needed), then  the correspoding bibtex
 ;; is queried online:
 ;;
@@ -95,10 +95,25 @@
 ;; - First implementation
 ;;
 ;;; Code:
+(require 'bibtex)
+(require 'json)
+(require 'time-date)
+(require 'xml)
+
+;; Declare external variables for the linter:
+(defvar savehist-additional-variables)
+
+(defgroup persid nil
+  "Persistent Identifier Library."
+  :group 'tex
+  :prefix "persid-")
+
 (defcustom persid-mail-address user-mail-address
-  "Email is used to access 'polite pools' on various domain and
-provide a faster access. Set it to nil if you prefer anonymous
-access.")
+  "Email used to access \"polite pools\".
+Useful on various domains that provide faster access.  Set to nil if
+you prefer anonymous access."
+  :group 'persid
+  :type 'string)
 
 (defcustom persid-isbn-generate-citekey nil
   "If non-nil, automatically generate a citekey when getting BibTeX from ISBN.
@@ -112,16 +127,17 @@ set by the user.
 The creation of the citekey is handled by the built-in `bibtex-mode' via the
 `bibtex-clean-entry' callable, and should respect user's configuration of the
 package, see `bibtex-generate-autokey'."
+  :group 'persid
   :type '(choice (symbol :tag "Generate citekey automatically" t)
                  (symbol :tag "Prompt user after generating citekey" 'prompt)
                  (symbol :tag "Respect user's configuration" 'user)
                  (const :tag "Don't generate citekey" nil)))
 
 (defconst persid-formats '(isbn issn doi pmid pmcid arxiv)
-  "List of known identifier formats")
+  "List of known identifier formats.")
 
 (defvar persid-history nil
-  "List of identifiers")
+  "List of identifiers.")
 
 (eval-after-load "savehist"
   '(add-to-list 'savehist-additional-variables 'persid-history))
@@ -142,8 +158,8 @@ package, see `bibtex-generate-autokey'."
   "Regular expression to match isbn-10 format.
 
 Note: this regex will also match non isbn-10 numbers because
-proper matching would require look-ahead regex that emacs is
-missing. You can however perform post-validation by checking that
+proper matching would require look-ahead regex that Emacs is
+missing.  You can however perform post-validation by checking that
 the total number of digits is exactly 10.
 
 See also:
@@ -167,8 +183,8 @@ https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/
   "Regular expression to match isbn-13 format.
 
 Note: this regex will also match non isbn-13 numbers because
-proper matching would require look-ahead regex that emacs is
-missing. You can however perform post-validation by checking that
+proper matching would require look-ahead regex that Emacs is
+missing.  You can however perform post-validation by checking that
 the total number of digits is exactly 13.
 
 See also:
@@ -199,9 +215,9 @@ https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/
           "\\)")               ;;
   "Regular expression to match doi format.
 
-Note: This will only match 99% of known doi. In order to catch
+Note: This will only match 99% of known doi.  In order to catch
 all of them, it would require a lot of complex regex that might
-not be worth the effort. See
+not be worth the effort.  See
 https://www.crossref.org/blog/dois-and-matching-regular-expressions")
 
 (defconst persid-pmid-regex
@@ -253,27 +269,27 @@ See https://arxiv.org/help/arxiv_identifier_for_services")
 
 (defconst persid-issn-query-url
   "https://api.openalex.org/venues/issn:%s"
-  "URL to query for an issn venue (json)")
+  "URL to query for an issn venue (json).")
 
 (defconst persid-doi-query-url
   "https://api.crossref.org/works/%s/transform/application/x-bibtex"
-  "URL to query for a doi work (bibtex)")
+  "URL to query for a doi work (bibtex).")
 
 (defconst persid-pmid-query-url
   "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?ids=%s&format=json"
-  "URL to query for a pmid conversion (json)")
+  "URL to query for a pmid conversion (json).")
 
 (defconst persid-pmcid-query-url
   "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?ids=%s&format=json"
-  "URL to query for a pmcid conversion (json)")
+  "URL to query for a pmcid conversion (json).")
 
 (defconst persid-arxiv-query-url
   "https://ui.adsabs.harvard.edu/abs/arXiv:%s/exportcitation"
-  "URL to query for an arxiv article (bibtex)")
+  "URL to query for an arxiv article (bibtex).")
 
 (defun persid-isbn-10-check (identifier)
-  "Check whether IDENTIFIER is a valid isbn-10 and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid ISBN-10.
+Returns a normalized identifier."
 
   (when (string-match persid-isbn-10-regex identifier)
     (let* ((group1 (match-string 1 identifier))
@@ -284,8 +300,8 @@ normalized identifier."
           normalized))))
 
 (defun persid-isbn-13-check (identifier)
-  "Check whether IDENTIFIER is a valid isbn-13 and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid ISBN-13.
+Returns a normalized identifier."
 
   (when (string-match persid-isbn-13-regex identifier)
     (let* ((group1 (match-string 1 identifier))
@@ -296,15 +312,15 @@ normalized identifier."
           normalized))))
 
 (defun persid-isbn-check (identifier)
-  "Check whether IDENTIFIER is a valid isbn-10 or isbn-13 and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid ISBN-10 or ISBN-13.
+Returns a normalized identifier."
 
   (or (persid-isbn-10-check identifier)
       (persid-isbn-13-check identifier)))
 
 (defun persid-issn-check (identifier)
-  "Check whether IDENTIFIER is a valid issn and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid ISSN.
+Returns a normalized identifier."
 
   (when (string-match persid-issn-regex identifier)
     (let* ((group1 (match-string 1 identifier))
@@ -313,8 +329,8 @@ normalized identifier."
         group2))))
 
 (defun persid-doi-check (identifier)
-  "Check whether IDENTIFIER is a valid doi and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid DOI.
+Returns a normalized identifier."
 
   (when (string-match persid-doi-regex identifier)
     (let* ((group1 (match-string 1 identifier))
@@ -323,8 +339,8 @@ normalized identifier."
         group2))))
 
 (defun persid-pmid-check (identifier)
-  "Check whether IDENTIFIER is a valid pmid and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid PMID.
+Returns a normalized identifier."
 
   (when (string-match persid-pmid-regex identifier)
     (let* ((group1 (match-string 1 identifier))
@@ -333,8 +349,8 @@ normalized identifier."
         group2))))
 
 (defun persid-pmcid-check (identifier)
-  "Check whether IDENTIFIER is a valid pmcid and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid PMCID.
+Returns a normalized identifier."
 
   (when (string-match persid-pmcid-regex identifier)
     (let* ((group1 (match-string 1 identifier))
@@ -343,8 +359,8 @@ normalized identifier."
         group2))))
 
 (defun persid-arxiv-check (identifier)
-  "Check whether IDENTIFIER is a valid arxiv and returns a
-normalized identifier."
+  "Check whether IDENTIFIER is a valid ARXIV.
+Returns a normalized identifier."
 
   (when (string-match persid-arxiv-regex identifier)
     (let* ((group1 (match-string 1 identifier))
@@ -359,11 +375,11 @@ normalized identifier."
     (dolist (id-format persid-formats)
       (let ((funcheck (intern (format "persid-%s-check" id-format))))
         (when (funcall funcheck identifier)
-          (setq formats (add-to-list 'formats id-format)))))
+          (push id-format formats))))
     formats))
 
 (defun persid-bibtex-from-doi (identifier)
-  "Retrieve bibtex information from a DOI IDENTIFIER"
+  "Retrieve bibtex information from a DOI IDENTIFIER."
 
   (when-let ((doi (persid-doi-check identifier)))
     (let* ((url (format persid-doi-query-url doi))
@@ -375,7 +391,7 @@ normalized identifier."
         (buffer-string)))))
 
 (defun persid-bibtex-from-pmid (identifier)
-  "Retrieve bibtex information from a PMID IDENTIFIER"
+  "Retrieve bibtex information from a PMID IDENTIFIER."
 
   (when-let* ((pmid (persid-pmid-check identifier))
               (doi (persid--pmc/pmid-to-doi pmid))
@@ -383,7 +399,7 @@ normalized identifier."
     (persid-bibtex-from-doi doi)))
 
 (defun persid-bibtex-from-pmcid (identifier)
-  "Retrieve bibtex information from a PMCID IDENTIFIER"
+  "Retrieve bibtex information from a PMCID IDENTIFIER."
 
   (when-let* ((pmcid (persid-pmcid-check identifier))
               (doi (persid--pmc/pmcid-to-doi pmcid))
@@ -391,7 +407,7 @@ normalized identifier."
     (persid-bibtex-from-doi doi)))
 
 (defun persid-info-from-issn (identifier)
-  "Retrieve information from a ISSN IDENTIFIER"
+  "Retrieve information from a ISSN IDENTIFIER."
 
   (when-let ((issn (persid-issn-check identifier)))
     (persid--openalex/venue persid-issn-query-url issn)))
@@ -422,7 +438,7 @@ See more: https://openlibrary.org/dev/docs/api/books"
             (cons 'url .url)))))
 
 (defun persid-bibtex-from-isbn (identifier)
-  "Retrieve bibtex information from an ISBN IDENTIFIER"
+  "Retrieve bibtex information from an ISBN IDENTIFIER."
 
   (when-let ((isbn (persid-isbn-check identifier)))
     (let* ((url (format persid-isbn-query-url isbn))
@@ -448,14 +464,14 @@ url       = {%s},
 
 (defun persid--decode-entities (html)
   "Decode HTML entities.
- See https://emacs.stackexchange.com/questions/3138"
+See https://emacs.stackexchange.com/questions/3138"
 
   (with-temp-buffer
     (save-excursion (insert html))
     (xml-parse-string)))
 
 (defun persid-bibtex-from-arxiv (identifier)
-  "Retrieve bibtex information from an arxiv IDENTIFIER"
+  "Retrieve bibtex information from an ARXIV IDENTIFIER."
 
   (when-let* ((arxiv (persid-arxiv-check identifier))
               (url (format persid-arxiv-query-url arxiv)))
@@ -471,10 +487,10 @@ url       = {%s},
                  (buffer-substring beg (- end (length "</textarea>")))))))))
 
 (defun persid-bibtex-from (identifier)
-  "Retrieve bibtex information from given IDENTIFIER"
+  "Retrieve bibtex information from given IDENTIFIER."
 
   (let ((formats (persid-identify identifier))
-        (bitex))
+        (bibtex))
     (catch 'found
       (dolist (format formats)
         (let ((bibfun (intern (format "persid-bibtex-from-%s" format))))
@@ -492,17 +508,18 @@ url       = {%s},
   (insert (persid-bibtex-from identifier)))
 
 (defun persid--openalex/normalize-name (name)
-  "Normalize NAME given as 'firstname(s) surname' to
- surname, firstname(s)."
+  "Normalize NAME.
+Convert from \"firstname(s) surname\" to \"surname, firstname(s)\"."
 
   (let ((parts (split-string name " ")))
     (concat (car (last parts)) ", "
             (mapconcat #'identity (butlast parts) " "))))
 
 (defun persid--openalex/venue (url identifier &optional email)
-  "Return the name of venue identified by IDENTIFIER using openalex as
-a backend. If an EMAIL is provided, it is appended to the query
-such as to access the (faster) polite-pool."
+  "Return the name of venue identified by IDENTIFIER using openalex.
+If an EMAIL is provided, it is appended to the query such as to
+access the (faster) polite-pool.  URL should be a valid query
+URL."
 
   (let* ((email (or email persid-mail-address))
          (url (format url identifier))
@@ -516,9 +533,9 @@ such as to access the (faster) polite-pool."
     (format "%s (%s)" title publisher)))
 
 (defun persid--pmc/pmid-to-doi (identifier &optional email)
-  "Convert a PMID identifier into a DOI identifier. If an EMAIL is
-provided, it is appended to the query such as to access the (faster)
-polite-pool."
+  "Convert a PMID IDENTIFIER into a DOI identifier.
+If an EMAIL is provided, it is appended to the query such as to
+access the (faster) polite-pool."
 
   ;; See https://www.ncbi.nlm.nih.gov/pmc/tools/id-converter-api/
   (let* ((email (or email persid-mail-address))
@@ -530,9 +547,9 @@ polite-pool."
         (plist-get (elt (plist-get json :records) 0) :doi)))))
 
 (defun persid--pmc/pmcid-to-doi (identifier &optional email)
-  "Convert a PMID identifier into a DOI identifier. If an EMAIL is
-provided, it is appended to the query such as to access the (faster)
-polite-pool."
+  "Convert a PMID IDENTIFIER into a DOI identifier.
+If an EMAIL is provided, it is appended to the query such as to
+access the (faster) polite-pool."
 
   (persid--pmc/pmid-to-doi identifier email))
 
